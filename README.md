@@ -12,14 +12,21 @@ Nous sommes donc restés finalement sur le TranslationTransform car c'est le seu
 
 
 ## Segmentation
-Le côté segmentation a été un gros souci pour ce projet. En effet, nous sommes partis de la base du TP qui consistait à trouver une seed qui permet d'avoir la segmentation optimale de la tumeur. Malheureusement, avec cette technique il y avait toujours des résidus (plutôt gros) qui apparaissaient. Nous avons donc cherché à améliorer cela de différentes manières : tout d'abord en modifiant les paramètres (seed, lower threshold, upper threshold...), puis en appliquant des filtres de prétraitrement (comme du floutage) et enfin en appliquant des algorithmes de post traitement (morphologie mathématique, sélection d'une zone etc.).
+Pour segmenter la tumeur, il y a plusieurs solutions. On a essayé 3 algorithmes. On a choisi d'essayer un algorithme de watershed, car c'est un algorithme que l'on a étudié et que l'on connait bien, on a essayé l'algorithme à seuillage d'Otsu car il est très facile d'utilisation du fait qu'il a très peu de paramètres, et on a essayé l'algorithme de RegionGrowing, qui est efficace mais semi-automatique.
+
+- Pour l'algorithme de watershed, on a besoin de garder que les bords du volume (du cerveau) donc on va passer un fitre de gradient de magnitude couplé à un filtre gaussien. Pour avoir un résultat à peu près correct, on utilise 0.2 en niveau de segmentation et 0.003 en seuil mais les bords du cerveau sont trop saillants par rapport aux bords de la tumeur donc on n'arrive pas à détacher la tumeur du cerveau.
+- Pour l'algorithme à seuillage d'Otsu, l'algorithme n'a pas nécessairement besoin de prétraitement pour fonctionner. Le rendu donné par cet algorithme ne nous convient pas car il n'est pas assez prècis et il n'est pas réglable donc n'est pas fonctionnel pour notre utilisation.
+- Nous avons finalement acté sur l'utilisation du region growing malgré le fait qu'il soit semi-automatique. Cela nous permet d'avoir une segmentation de la tumeur propre facilement. Notre pipeline ne sera donc pas utilisable pour d'autres données car nous avons hardcodé les seed pour les deux volumes.
+
+Le côté segmentation a été un gros souci pour ce projet. En effet, avec la technique utilisée, il faut trouver la seed et les threshold qui permettent de ne pas avoir de résidu et nous n'avons pas réussi à les trouver. Nous avons donc cherché à améliorer cela de différentes manières : tout d'abord en modifiant les paramètres (seed, lower threshold, upper threshold...), puis en appliquant des filtres de prétraitrement (comme du floutage) et enfin en appliquant des algorithmes de post traitement (morphologie mathématique, sélection d'une zone etc.).
 La façon la plus simple que nous aurions pu utiliser était de sélectionner la zone intérieure du cerveau à la main (en délimitant une "boite") mais cela n'a pas vraiment de sens car cela voudrait dire que l'algorithme n'est pas du tout automatisé. Nous nous sommes donc plutôt penché sur la morphologie mathématiques.
-Nous avons donc cherché beaucoup de différentes manières de bien segmenter la zone que l'on voulait, mais aucune n'était optimale et nous n'avons pas réussi à obtenir un résultat exploitable. Nous pensons que nous n'avons pas assez exploré la piste des seed et des threshold concernant la segmentation d'ITK, mais nous n'avions plus d'idée sur la façon de procéder à cela.
+Nous avons donc cherché beaucoup de différentes manières de bien segmenter la zone que l'on voulait, mais aucune n'était optimale et nous n'avons pas réussi à obtenir un résultat exploitable. Nous pensons que nous n'avons pas assez exploré la piste des seed et des thresholds concernant la segmentation d'ITK, mais nous n'avions plus d'idée sur la façon de procéder à cela.
+Dans notre code final, la segmentation se fait en deux parties : une semgentation "légère" qui permet de voir les gros vide qu'il y a dans le cerveau, et une segmentation plus "lourde" qui permet de voir les parties importantes à regarder.
 
 
 ## Affichage avec VTK
 Pour la partie VTK, nous voulions simplement superposer la segmentation de la tumeur avec une versions "simplifiée" (en réalité c'est une semi-segmentation) du cerveau pour que l'on puisse voir facilement cette tumeur. Nous avons fait cela pour les 2 images, puis nous avons créé une 3e image qui résulte de la différence entre les deux premières images simplifiée. C'est sur cette 3e image que l'on voit très bien la tumeur apparaître.
-Nous avons créé 3 zones différentes pour mieux voir chaque image et leur segmentation correspondante.
+Nous avons créé 3 zones différentes pour mieux voir chaque image et leur segmentation correspondante. Les segmentation des deux images sont une superposistion de leur segmentation "légère" et "lourde".
 
 
 ## Utilisation du projet
