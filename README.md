@@ -44,3 +44,5 @@ Pour utiliser le projet, il faut simplement posséder les bibliothèques itk et 
 Version ITK utilisée : 5.4.0
 
 Version VTK utilisée : 9.3.1
+
+Lien du GitHub : https://github.com/nicolasregniervigouroux/ITK-VTK
